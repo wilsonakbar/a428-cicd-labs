@@ -26,11 +26,24 @@ pipeline {
             }
         }
 
-        stage('Deliver') {
+        stage('Manual Approval') {
+            steps {
+                script {
+                    def userInput = input(
+                        id: 'Proceed1',
+                        message: 'Lanjutkan ke tahap Deploy?',
+                        ok: 'Proceed'
+                    )
+                }
+            }
+        }
+
+        stage('Deploy') {
             steps {
                 sh 'mkdir -p .npm-cache'
                 sh './jenkins/scripts/deliver.sh'
-                input message: 'Finished using the website? (Click "Proceed" to continue)'
+                echo '[INFO] Aplikasi berjalan. Menunggu selama 1 menit sebelum kill...'
+                sleep(time: 1, unit: 'MINUTES') // ⏱️ Delay otomatis 1 menit
                 sh './jenkins/scripts/kill.sh'
             }
         }
